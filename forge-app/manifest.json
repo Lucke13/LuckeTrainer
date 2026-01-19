@@ -2,7 +2,7 @@
   "name": "FORGE Träningsdagbok",
   "short_name": "FORGE",
   "description": "Din personliga träningsdagbok",
-  "start_url": "/index.html",
+  "start_url": "/LuckeTrainer/forge-app/",
   "display": "standalone",
   "background_color": "#0a0f14",
   "theme_color": "#00d4aa",
