@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FORGE">
+    <meta name="theme-color" content="#00d4aa">
+    <title>FORGE</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #00d4aa;
+            --primary-dark: #00b894;
+            --primary-glow: rgba(0, 212, 170, 0.3);
+            --accent: #0984e3;
+            --accent-dark: #0652DD;
+            --energy: #ff7675;
+            --energy-dark: #d63031;
+            --success: #00b894;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-elevated: #ffffff;
+            --text-primary: #2d3436;
+            --text-secondary: #636e72;
+            --text-muted: #b2bec3;
+            --border: rgba(0, 0, 0, 0.08);
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-lg: rgba(0, 0, 0, 0.12);
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: #0a0f14;
+            --bg-secondary: #111820;
+            --bg-card: #1a222d;
+            --bg-elevated: #232d3b;
+            --text-primary: #f5f6fa;
+            --text-secondary: #a4b0be;
+            --text-muted: #57606f;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-lg: rgba(0, 0, 0, 0.5);
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        html, body { 
+            height: 100%; 
+            overflow: hidden;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding-top: var(--safe-top);
+            padding-bottom: calc(70px + var(--safe-bottom));
+        }
+        
+        h1, h2, h3, h4 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+        
+        .app { height: 100%; display: flex; flex-direction: column; }
+        
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: var(--space-md);
+            padding-bottom: var(--space-xl);
+        }
+        
+        /* Bottom Navigation */
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: var(--space-sm);
+            padding-bottom: calc(var(--space-sm) + var(--safe-bottom));
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: var(--space-xs) var(--space-sm);
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+        
+        .nav-item svg { width: 24px; height: 24px; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item:active { transform: scale(0.95); }
+        
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            margin-bottom: var(--space-md);
+        }
+        
+        .header-title { font-size: 1.75rem; }
+        
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            border: 1px solid var(--border);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-md);
+        }
+        
+        .card-title { font-size: 1.1rem; letter-spacing: 0.05em; }
+        
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-icon svg { width: 18px; height: 18px; }
+        .card-icon.primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+        .card-icon.accent { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: white; }
+        .card-icon.energy { background: linear-gradient(135deg, var(--energy), var(--energy-dark)); color: white; }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            border: 1px solid var(--border);
+        }
+        
+        .stat-value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+        
+        /* Welcome Banner */
+        .welcome {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            color: white;
+            margin-bottom: var(--space-md);
+        }
+        
+        .welcome-title { font-size: 1.75rem; margin-bottom: var(--space-xs); }
+        .welcome-text { opacity: 0.9; font-size: 0.9rem; }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-xs);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            border: none;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .btn:active { transform: scale(0.97); }
+        .btn svg { width: 16px; height: 16px; }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-ghost { background: transparent; color: var(--text-secondary); }
+        .btn-sm { padding: var(--space-xs) var(--space-sm); font-size: 0.75rem; }
+        .btn-block { width: 100%; }
+        .btn-fab {
+            position: fixed;
+            bottom: calc(80px + var(--safe-bottom));
+            right: var(--space-md);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            box-shadow: 0 4px 20px var(--primary-glow);
+            z-index: 50;
+        }
+        
+        .btn-fab svg { width: 24px; height: 24px; }
+        
+        /* Forms */
+        .form-group { margin-bottom: var(--space-md); }
+        .form-label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); margin-bottom: var(--space-xs); }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px; /* Prevents zoom on iOS */
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-textarea { min-height: 80px; resize: none; }
+        
+        .form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-sm); }
+        
+        /* Progress */
+        .progress { height: 8px; background: var(--bg-primary); border-radius: 100px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 100px; }
+        
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .badge svg { width: 12px; height: 12px; }
+        .badge-primary { background: var(--primary-glow); color: var(--primary); }
+        .badge-success { background: rgba(0, 184, 148, 0.15); color: var(--success); }
+        
+        /* Pages */
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s;
+        }
+        
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: var(--space-lg);
+            padding-bottom: calc(var(--space-lg) + var(--safe-bottom));
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+        
+        .modal-overlay.active .modal { transform: translateY(0); }
+        
+        .modal-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 0 auto var(--space-md);
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .modal-title { font-size: 1.25rem; }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Exercise Field */
+        .exercise-field {
+            background: var(--bg-elevated);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .exercise-field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .exercise-field-num { font-weight: 600; color: var(--primary); font-size: 0.85rem; }
+        
+        /* List Items */
+        .list-item {
+            background: var(--bg-elevated);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .list-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .list-item-title { font-weight: 600; }
+        .list-item-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .list-item-actions { display: flex; gap: var(--space-xs); }
+        
+        /* Day Cards */
+        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-xs); }
+        
+        @media (max-width: 500px) {
+            .week-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        
+        .day-card {
+            background: var(--bg-elevated);
+            border-radius: var(--radius-sm);
+            padding: var(--space-sm);
+            text-align: center;
+            border: 2px solid transparent;
+            cursor: pointer;
+            min-height: 70px;
+        }
+        
+        .day-card.today { border-color: var(--primary); background: var(--primary-glow); }
+        .day-card.has-workout { border-color: var(--success); }
+        .day-name { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; }
+        .day-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; }
+        .day-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); margin: 4px auto 0; }
+        .day-dot.done { background: var(--success); }
+        
+        /* Empty State */
+        .empty { text-align: center; padding: var(--space-2xl) var(--space-md); color: var(--text-muted); }
+        .empty-icon { margin-bottom: var(--space-md); opacity: 0.5; }
+        .empty-icon svg { width: 48px; height: 48px; }
+        .empty-title { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: var(--space-xs); }
+        .empty-text { margin-bottom: var(--space-lg); font-size: 0.9rem; }
+        
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: calc(var(--space-md) + var(--safe-top));
+            left: var(--space-md);
+            right: var(--space-md);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            pointer-events: none;
+        }
+        
+        .toast {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            box-shadow: 0 8px 32px var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            animation: toastIn 0.3s ease;
+            pointer-events: auto;
+        }
+        
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--energy); }
+        .toast svg { width: 18px; height: 18px; flex-shrink: 0; }
+        
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Chart */
+        .chart-container { height: 200px; }
+        
+        /* History */
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .history-item:last-child { border-bottom: none; }
+        .history-date { text-align: center; min-width: 45px; }
+        .history-day { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; color: var(--primary); }
+        .history-month { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); }
+        .history-info { flex: 1; }
+        .history-title { font-weight: 500; font-size: 0.9rem; }
+        .history-exercises { font-size: 0.75rem; color: var(--text-muted); }
+        
+        /* Utilities */
+        .mb-sm { margin-bottom: var(--space-sm); }
+        .mb-md { margin-bottom: var(--space-md); }
+        .text-center { text-align: center; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-sm { gap: var(--space-sm); }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="app-content">
+            <!-- DASHBOARD -->
+            <div class="page active" id="page-dashboard">
+                <div class="header">
+                    <h1 class="header-title">FORGE</h1>
+                    <button class="header-btn" id="themeToggle"></button>
+                </div>
+                
+                <div class="welcome">
+                    <h2 class="welcome-title">DAGS ATT TRÄNA!</h2>
+                    <p class="welcome-text" id="quote">"Det enda dåliga passet är det som inte blev av."</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Totalt pass</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statStreak">0</div>
+                        <div class="stat-label">Dagars streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statWeek">0</div>
+                        <div class="stat-label">Denna vecka</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statGoals">0%</div>
+                        <div class="stat-label">Måluppfyllnad</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">DAGENS PASS</span>
+                    </div>
+                    <div id="todayWorkout"></div>
+                </div>
+            </div>
+            
+            <!-- SCHEDULE -->
+            <div class="page" id="page-schedule">
+                <div class="header">
+                    <h1 class="header-title">SCHEMA</h1>
+                    <div class="flex gap-sm">
+                        <button class="btn btn-secondary btn-sm" id="prevWeek">←</button>
+                        <button class="btn btn-secondary btn-sm" id="todayBtn">Idag</button>
+                        <button class="btn btn-secondary btn-sm" id="nextWeek">→</button>
+                    </div>
+                </div>
+                <div class="week-grid" id="weekGrid"></div>
+            </div>
+            
+            <!-- WORKOUTS -->
+            <div class="page" id="page-workouts">
+                <div class="header">
+                    <h1 class="header-title">PASS</h1>
+                </div>
+                <div id="workoutsList"></div>
+            </div>
+            
+            <!-- GOALS -->
+            <div class="page" id="page-goals">
+                <div class="header">
+                    <h1 class="header-title">MÅL</h1>
+                </div>
+                <div id="goalsList"></div>
+            </div>
+            
+            <!-- STATS -->
+            <div class="page" id="page-stats">
+                <div class="header">
+                    <h1 class="header-title">STATISTIK</h1>
+                </div>
+                <div class="card">
+                    <div class="card-title mb-md">SENASTE 30 DAGARNA</div>
+                    <div class="chart-container">
+                        <canvas id="chart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title mb-md">HISTORIK</div>
+                    <div id="historyList"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Nav -->
+        <nav class="nav-bottom">
+            <button class="nav-item active" data-page="dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+                <span>Hem</span>
+            </button>
+            <button class="nav-item" data-page="schedule">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>Schema</span>
+            </button>
+            <button class="nav-item" data-page="workouts">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+                <span>Pass</span>
+            </button>
+            <button class="nav-item" data-page="goals">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                <span>Mål</span>
+            </button>
+            <button class="nav-item" data-page="stats">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                <span>Statistik</span>
+            </button>
+        </nav>
+        
+        <!-- FAB -->
+        <button class="btn btn-primary btn-fab" id="fabBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+    </div>
+    
+    <!-- WORKOUT MODAL -->
+    <div class="modal-overlay" id="workoutModal">
+        <div class="modal">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h3 class="modal-title" id="workoutModalTitle">NYTT PASS</h3>
+                <button class="modal-close" id="closeWorkoutModal">✕</button>
+            </div>
+            <form id="workoutForm">
+                <div class="form-group">
+                    <label class="form-label">Namn</label>
+                    <input type="text" class="form-input" id="workoutName" placeholder="T.ex. Överkropp">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Beskrivning</label>
+                    <input type="text" class="form-input" id="workoutDesc" placeholder="Valfritt">
+                </div>
+                <div class="form-group">
+                    <div class="flex justify-between items-center mb-sm">
+                        <label class="form-label" style="margin:0">Övningar</label>
+                        <button type="button" class="btn btn-secondary btn-sm" id="addExerciseBtn">+ Lägg till</button>
+                    </div>
+                    <div id="exercisesList"></div>
+                </div>
+                <input type="hidden" id="workoutId">
+                <button type="submit" class="btn btn-primary btn-block">Spara pass</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- GOAL MODAL -->
+    <div class="modal-overlay" id="goalModal">
+        <div class="modal">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h3 class="modal-title" id="goalModalTitle">NYTT MÅL</h3>
+                <button class="modal-close" id="closeGoalModal">✕</button>
+            </div>
+            <form id="goalForm">
+                <div class="form-group">
+                    <label class="form-label">Typ</label>
+                    <select class="form-select" id="goalType">
+                        <option value="frequency">Pass per vecka</option>
+                        <option value="total">Total räkning</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Namn</label>
+                    <input type="text" class="form-input" id="goalTitle" placeholder="T.ex. Träna 3 ggr/vecka">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mål</label>
+                    <input type="number" class="form-input" id="goalTarget" placeholder="3" min="1">
+                </div>
+                <div class="form-group" id="goalCurrentGroup" style="display:none">
+                    <label class="form-label">Nuvarande</label>
+                    <input type="number" class="form-input" id="goalCurrent" value="0" min="0">
+                </div>
+                <input type="hidden" id="goalId">
+                <button type="submit" class="btn btn-primary btn-block">Spara mål</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- SCHEDULE MODAL -->
+    <div class="modal-overlay" id="scheduleModal">
+        <div class="modal">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h3 class="modal-title">SCHEMALÄGG</h3>
+                <button class="modal-close" id="closeScheduleModal">✕</button>
+            </div>
+            <form id="scheduleForm">
+                <div class="form-group">
+                    <label class="form-label">Datum</label>
+                    <input type="date" class="form-input" id="scheduleDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Pass</label>
+                    <select class="form-select" id="scheduleWorkout"></select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Schemalägg</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <script>
+        // ===== ICONS =====
+        const SVG = {
+            check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>',
+            x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+            trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',
+            plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+            moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',
+            sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>',
+            dumbbell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6.5 6.5 11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 10l7-7M14 21l7-7"/></svg>',
+            target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+            checkCircle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+            circle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>'
+        };
+        
+        // ===== STATE =====
+        let state = {
+            workouts: [],
+            goals: [],
+            scheduled: [],
+            history: [],
+            weekOffset: 0,
+            theme: 'dark'
+        };
+        
+        let currentPage = 'dashboard';
+        let chart = null;
+        let exerciseCount = 0;
+        
+        // ===== QUOTES =====
+        const quotes = [
+            "Det enda dåliga passet är det som inte blev av.",
+            "Svett är bara fett som gråter.",
+            "Din kropp klarar nästan vad som helst.",
+            "Smärtan idag blir styrkan imorgon.",
+            "Framgång börjar med självdisciplin.",
+            "Din enda begränsning är du själv.",
+            "Gör dig själv stolt.",
+            "Starkare för varje dag."
+        ];
+        
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', init);
+        
+        function init() {
+            loadState();
+            initTheme();
+            initNav();
+            initModals();
+            initForms();
+            render();
+            setQuote();
+            
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js');
+            }
+        }
+        
+        function loadState() {
+            const saved = localStorage.getItem('forge');
+            if (saved) state = { ...state, ...JSON.parse(saved) };
+        }
+        
+        function saveState() {
+            localStorage.setItem('forge', JSON.stringify(state));
+        }
+        
+        function setQuote() {
+            document.getElementById('quote').textContent = '"' + quotes[Math.floor(Math.random() * quotes.length)] + '"';
+        }
+        
+        // ===== THEME =====
+        function initTheme() {
+            const saved = localStorage.getItem('forgeTheme');
+            if (saved) state.theme = saved;
+            applyTheme();
+            
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                state.theme = state.theme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('forgeTheme', state.theme);
+                applyTheme();
+            });
+        }
+        
+        function applyTheme() {
+            document.documentElement.setAttribute('data-theme', state.theme);
+            document.getElementById('themeToggle').innerHTML = state.theme === 'light' ? SVG.moon : SVG.sun;
+            if (chart) renderChart();
+        }
+        
+        // ===== NAVIGATION =====
+        function initNav() {
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+            });
+            
+            document.getElementById('prevWeek').addEventListener('click', () => { state.weekOffset--; renderWeek(); });
+            document.getElementById('nextWeek').addEventListener('click', () => { state.weekOffset++; renderWeek(); });
+            document.getElementById('todayBtn').addEventListener('click', () => { state.weekOffset = 0; renderWeek(); });
+            
+            document.getElementById('fabBtn').addEventListener('click', handleFab);
+        }
+        
+        function navigateTo(page) {
+            currentPage = page;
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+            document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
+            if (page === 'stats') setTimeout(renderChart, 100);
+        }
+        
+        function handleFab() {
+            if (currentPage === 'workouts') openWorkoutModal();
+            else if (currentPage === 'goals') openGoalModal();
+            else if (currentPage === 'schedule') openScheduleModal(new Date());
+            else openScheduleModal(new Date());
+        }
+        
+        // ===== MODALS =====
+        function initModals() {
+            // Close buttons
+            document.getElementById('closeWorkoutModal').addEventListener('click', closeWorkoutModal);
+            document.getElementById('closeGoalModal').addEventListener('click', closeGoalModal);
+            document.getElementById('closeScheduleModal').addEventListener('click', closeScheduleModal);
+            
+            // Overlay click
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', e => {
+                    if (e.target === overlay) overlay.classList.remove('active');
+                });
+            });
+            
+            // Add exercise button
+            document.getElementById('addExerciseBtn').addEventListener('click', () => addExercise());
+            
+            // Goal type change
+            document.getElementById('goalType').addEventListener('change', () => {
+                document.getElementById('goalCurrentGroup').style.display = 
+                    document.getElementById('goalType').value === 'total' ? 'block' : 'none';
+            });
+        }
+        
+        function openWorkoutModal(workout = null) {
+            document.getElementById('workoutForm').reset();
+            document.getElementById('exercisesList').innerHTML = '';
+            document.getElementById('workoutId').value = '';
+            exerciseCount = 0;
+            
+            if (workout) {
+                document.getElementById('workoutModalTitle').textContent = 'REDIGERA PASS';
+                document.getElementById('workoutId').value = workout.id;
+                document.getElementById('workoutName').value = workout.name;
+                document.getElementById('workoutDesc').value = workout.description || '';
+                workout.exercises.forEach(ex => addExercise(ex));
+            } else {
+                document.getElementById('workoutModalTitle').textContent = 'NYTT PASS';
+                addExercise();
+            }
+            
+            document.getElementById('workoutModal').classList.add('active');
+        }
+        
+        function closeWorkoutModal() {
+            document.getElementById('workoutModal').classList.remove('active');
+        }
+        
+        function openGoalModal(goal = null) {
+            document.getElementById('goalForm').reset();
+            document.getElementById('goalId').value = '';
+            document.getElementById('goalCurrentGroup').style.display = 'none';
+            
+            if (goal) {
+                document.getElementById('goalModalTitle').textContent = 'REDIGERA MÅL';
+                document.getElementById('goalId').value = goal.id;
+                document.getElementById('goalType').value = goal.type;
+                document.getElementById('goalTitle').value = goal.title;
+                document.getElementById('goalTarget').value = goal.target;
+                document.getElementById('goalCurrent').value = goal.current || 0;
+                if (goal.type === 'total') document.getElementById('goalCurrentGroup').style.display = 'block';
+            } else {
+                document.getElementById('goalModalTitle').textContent = 'NYTT MÅL';
+            }
+            
+            document.getElementById('goalModal').classList.add('active');
+        }
+        
+        function closeGoalModal() {
+            document.getElementById('goalModal').classList.remove('active');
+        }
+        
+        function openScheduleModal(date) {
+            document.getElementById('scheduleDate').value = formatDate(date);
+            
+            const select = document.getElementById('scheduleWorkout');
+            select.innerHTML = state.workouts.length === 0 
+                ? '<option value="">Skapa ett pass först</option>'
+                : state.workouts.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
+            
+            document.getElementById('scheduleModal').classList.add('active');
+        }
+        
+        function closeScheduleModal() {
+            document.getElementById('scheduleModal').classList.remove('active');
+        }
+        
+        // ===== FORMS =====
+        function initForms() {
+            document.getElementById('workoutForm').addEventListener('submit', saveWorkout);
+            document.getElementById('goalForm').addEventListener('submit', saveGoal);
+            document.getElementById('scheduleForm').addEventListener('submit', saveSchedule);
+        }
+        
+        function addExercise(ex = null) {
+            exerciseCount++;
+            const id = exerciseCount;
+            const html = `
+                <div class="exercise-field" id="ex-${id}">
+                    <div class="exercise-field-header">
+                        <span class="exercise-field-num">Övning ${id}</span>
+                        <button type="button" class="btn btn-ghost btn-sm" onclick="removeExercise(${id})">${SVG.x}</button>
+                    </div>
+                    <div class="form-group mb-sm">
+                        <input type="text" class="form-input" placeholder="Övningens namn" data-name value="${ex ? ex.name : ''}">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="margin:0">
+                            <label class="form-label">Set</label>
+                            <input type="number" class="form-input" placeholder="3" data-sets value="${ex ? ex.sets : ''}" min="1">
+                        </div>
+                        <div class="form-group" style="margin:0">
+                            <label class="form-label">Reps</label>
+                            <input type="number" class="form-input" placeholder="10" data-reps value="${ex ? ex.reps : ''}" min="1">
+                        </div>
+                        <div class="form-group" style="margin:0">
+                            <label class="form-label">Notering</label>
+                            <input type="text" class="form-input" placeholder="-" data-notes value="${ex ? ex.notes || '' : ''}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('exercisesList').insertAdjacentHTML('beforeend', html);
+        }
+        
+        function removeExercise(id) {
+            document.getElementById('ex-' + id)?.remove();
+        }
+        
+        function saveWorkout(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('workoutName').value.trim();
+            if (!name) {
+                toast('Ange ett namn', 'error');
+                return;
+            }
+            
+            const exercises = [];
+            document.querySelectorAll('.exercise-field').forEach(field => {
+                const n = field.querySelector('[data-name]').value.trim();
+                if (n) {
+                    exercises.push({
+                        name: n,
+                        sets: field.querySelector('[data-sets]').value || '3',
+                        reps: field.querySelector('[data-reps]').value || '10',
+                        notes: field.querySelector('[data-notes]').value
+                    });
+                }
+            });
+            
+            if (exercises.length === 0) {
+                toast('Lägg till minst en övning', 'error');
+                return;
+            }
+            
+            const id = document.getElementById('workoutId').value || genId();
+            const workout = {
+                id,
+                name,
+                description: document.getElementById('workoutDesc').value,
+                exercises
+            };
+            
+            const idx = state.workouts.findIndex(w => w.id === id);
+            if (idx >= 0) {
+                state.workouts[idx] = workout;
+                toast('Pass uppdaterat!', 'success');
+            } else {
+                state.workouts.push(workout);
+                toast('Pass skapat!', 'success');
+            }
+            
+            saveState();
+            render();
+            closeWorkoutModal();
+        }
+        
+        function saveGoal(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('goalTitle').value.trim();
+            const target = parseInt(document.getElementById('goalTarget').value);
+            
+            if (!title || !target) {
+                toast('Fyll i alla fält', 'error');
+                return;
+            }
+            
+            const id = document.getElementById('goalId').value || genId();
+            const goal = {
+                id,
+                type: document.getElementById('goalType').value,
+                title,
+                target,
+                current: parseInt(document.getElementById('goalCurrent').value) || 0
+            };
+            
+            const idx = state.goals.findIndex(g => g.id === id);
+            if (idx >= 0) {
+                state.goals[idx] = goal;
+                toast('Mål uppdaterat!', 'success');
+            } else {
+                state.goals.push(goal);
+                toast('Mål tillagt!', 'success');
+            }
+            
+            saveState();
+            render();
+            closeGoalModal();
+        }
+        
+        function saveSchedule(e) {
+            e.preventDefault();
+            
+            const workoutId = document.getElementById('scheduleWorkout').value;
+            if (!workoutId) {
+                toast('Välj ett pass', 'error');
+                return;
+            }
+            
+            state.scheduled.push({
+                id: genId(),
+                date: document.getElementById('scheduleDate').value,
+                workoutId,
+                completed: false
+            });
+            
+            saveState();
+            render();
+            closeScheduleModal();
+            toast('Pass schemalagt!', 'success');
+        }
+        
+        // ===== ACTIONS =====
+        window.editWorkout = id => {
+            const w = state.workouts.find(w => w.id === id);
+            if (w) openWorkoutModal(w);
+        };
+        
+        window.deleteWorkout = id => {
+            if (confirm('Ta bort passet?')) {
+                state.workouts = state.workouts.filter(w => w.id !== id);
+                saveState();
+                render();
+                toast('Pass borttaget', 'success');
+            }
+        };
+        
+        window.editGoal = id => {
+            const g = state.goals.find(g => g.id === id);
+            if (g) openGoalModal(g);
+        };
+        
+        window.deleteGoal = id => {
+            if (confirm('Ta bort målet?')) {
+                state.goals = state.goals.filter(g => g.id !== id);
+                saveState();
+                render();
+                toast('Mål borttaget', 'success');
+            }
+        };
+        
+        window.incrementGoal = id => {
+            const g = state.goals.find(g => g.id === id);
+            if (g) {
+                g.current = (g.current || 0) + 1;
+                saveState();
+                render();
+                if (g.current >= g.target) toast('Mål uppnått!', 'success');
+            }
+        };
+        
+        window.completeWorkout = id => {
+            const s = state.scheduled.find(s => s.id === id);
+            if (s && !s.completed) {
+                s.completed = true;
+                state.history.push({
+                    id: genId(),
+                    workoutId: s.workoutId,
+                    completedAt: new Date().toISOString()
+                });
+                saveState();
+                render();
+                toast('Bra jobbat!', 'success');
+            }
+        };
+        
+        window.scheduleDay = dateStr => {
+            openScheduleModal(new Date(dateStr));
+        };
+        
+        // ===== RENDER =====
+        function render() {
+            renderDashboard();
+            renderWeek();
+            renderWorkouts();
+            renderGoals();
+            renderHistory();
+        }
+        
+        function renderDashboard() {
+            document.getElementById('statTotal').textContent = state.history.length;
+            document.getElementById('statStreak').textContent = calcStreak();
+            document.getElementById('statWeek').textContent = getWeekWorkouts();
+            document.getElementById('statGoals').textContent = calcGoalsProgress() + '%';
+            
+            // Today's workout
+            const container = document.getElementById('todayWorkout');
+            const today = formatDate(new Date());
+            const todayScheduled = state.scheduled.filter(s => s.date === today);
+            
+            if (todayScheduled.length === 0) {
+                container.innerHTML = `
+                    <div class="empty">
+                        <div class="empty-icon">${SVG.dumbbell}</div>
+                        <p class="empty-text">Inget pass idag</p>
+                        <button class="btn btn-primary" onclick="scheduleDay('${today}')">Schemalägg</button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = todayScheduled.map(s => {
+                    const w = state.workouts.find(w => w.id === s.workoutId);
+                    if (!w) return '';
+                    return `
+                        <div class="list-item">
+                            <div class="list-item-header">
+                                <span class="list-item-title">${w.name}</span>
+                                ${s.completed 
+                                    ? '<span class="badge badge-success">' + SVG.check + ' Klar</span>'
+                                    : '<button class="btn btn-primary btn-sm" onclick="completeWorkout(\'' + s.id + '\')">' + SVG.check + ' Klar</button>'
+                                }
+                            </div>
+                            <div class="list-item-meta">${w.exercises.length} övningar</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        function renderWeek() {
+            const container = document.getElementById('weekGrid');
+            const days = getWeekDays(state.weekOffset);
+            const today = formatDate(new Date());
+            const dayNames = ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör'];
+            
+            container.innerHTML = days.map(d => {
+                const dateStr = formatDate(d);
+                const isToday = dateStr === today;
+                const scheduled = state.scheduled.filter(s => s.date === dateStr);
+                const hasWorkout = scheduled.length > 0;
+                const allDone = hasWorkout && scheduled.every(s => s.completed);
+                
+                return `
+                    <div class="day-card ${isToday ? 'today' : ''} ${allDone ? 'has-workout' : ''}" onclick="scheduleDay('${dateStr}')">
+                        <div class="day-name">${dayNames[d.getDay()]}</div>
+                        <div class="day-num">${d.getDate()}</div>
+                        ${hasWorkout ? `<div class="day-dot ${allDone ? 'done' : ''}"></div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderWorkouts() {
+            const container = document.getElementById('workoutsList');
+            
+            if (state.workouts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty">
+                        <div class="empty-icon">${SVG.dumbbell}</div>
+                        <h3 class="empty-title">Inga pass</h3>
+                        <p class="empty-text">Skapa ditt första träningspass</p>
+                        <button class="btn btn-primary" onclick="openWorkoutModal()">Skapa pass</button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = state.workouts.map(w => `
+                    <div class="list-item">
+                        <div class="list-item-header">
+                            <span class="list-item-title">${w.name}</span>
+                            <div class="list-item-actions">
+                                <button class="btn btn-ghost btn-sm" onclick="editWorkout('${w.id}')">Redigera</button>
+                                <button class="btn btn-ghost btn-sm" onclick="deleteWorkout('${w.id}')">${SVG.trash}</button>
+                            </div>
+                        </div>
+                        <div class="list-item-meta">${w.exercises.map(e => e.name).join(', ')}</div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function renderGoals() {
+            const container = document.getElementById('goalsList');
+            
+            if (state.goals.length === 0) {
+                container.innerHTML = `
+                    <div class="empty">
+                        <div class="empty-icon">${SVG.target}</div>
+                        <h3 class="empty-title">Inga mål</h3>
+                        <p class="empty-text">Sätt ditt första mål</p>
+                        <button class="btn btn-primary" onclick="openGoalModal()">Lägg till mål</button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = state.goals.map(g => {
+                    const progress = calcGoalProgress(g);
+                    return `
+                        <div class="list-item">
+                            <div class="list-item-header">
+                                <span class="list-item-title">${g.title}</span>
+                                <div class="list-item-actions">
+                                    ${g.type === 'total' ? `<button class="btn btn-primary btn-sm" onclick="incrementGoal('${g.id}')">${SVG.plus} 1</button>` : ''}
+                                    <button class="btn btn-ghost btn-sm" onclick="editGoal('${g.id}')">Redigera</button>
+                                    <button class="btn btn-ghost btn-sm" onclick="deleteGoal('${g.id}')">${SVG.trash}</button>
+                                </div>
+                            </div>
+                            <div class="list-item-meta mb-sm">
+                                ${g.type === 'frequency' ? getWeekWorkouts() + ' / ' + g.target + ' denna vecka' : (g.current || 0) + ' / ' + g.target}
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: ${Math.min(progress, 100)}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+            
+            if (state.history.length === 0) {
+                container.innerHTML = '<p class="text-center" style="color: var(--text-muted)">Ingen historik ännu</p>';
+            } else {
+                const sorted = [...state.history].sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+                const months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+                
+                container.innerHTML = sorted.slice(0, 10).map(h => {
+                    const d = new Date(h.completedAt);
+                    const w = state.workouts.find(w => w.id === h.workoutId);
+                    return `
+                        <div class="history-item">
+                            <div class="history-date">
+                                <div class="history-day">${d.getDate()}</div>
+                                <div class="history-month">${months[d.getMonth()]}</div>
+                            </div>
+                            <div class="history-info">
+                                <div class="history-title">${w ? w.name : 'Borttaget pass'}</div>
+                                <div class="history-exercises">${w ? w.exercises.map(e => e.name).join(', ') : ''}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        function renderChart() {
+            const ctx = document.getElementById('chart');
+            if (!ctx) return;
+            if (chart) chart.destroy();
+            
+            const labels = [], data = [];
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                labels.push(d.getDate());
+                data.push(state.history.filter(h => formatDate(new Date(h.completedAt)) === formatDate(d)).length);
+            }
+            
+            const isDark = state.theme === 'dark';
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: isDark ? 'rgba(0,212,170,0.6)' : 'rgba(0,212,170,0.8)',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1, color: isDark ? '#a4b0be' : '#636e72' }, grid: { color: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' } },
+                        x: { ticks: { color: isDark ? '#a4b0be' : '#636e72' }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+        
+        // ===== HELPERS =====
+        function formatDate(d) { return d.toISOString().split('T')[0]; }
+        function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+        
+        function getWeekDays(offset = 0) {
+            const days = [], now = new Date();
+            now.setDate(now.getDate() + offset * 7);
+            const start = new Date(now);
+            start.setDate(now.getDate() - now.getDay());
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(start);
+                d.setDate(start.getDate() + i);
+                days.push(d);
+            }
+            return days;
+        }
+        
+        function getWeekWorkouts() {
+            const now = new Date(), start = new Date(now);
+            start.setDate(now.getDate() - now.getDay());
+            start.setHours(0, 0, 0, 0);
+            return state.history.filter(h => new Date(h.completedAt) >= start).length;
+        }
+        
+        function calcStreak() {
+            if (state.history.length === 0) return 0;
+            let streak = 0, d = new Date();
+            d.setHours(0, 0, 0, 0);
+            const todayKey = formatDate(d);
+            if (!state.history.some(h => formatDate(new Date(h.completedAt)) === todayKey)) {
+                d.setDate(d.getDate() - 1);
+                if (!state.history.some(h => formatDate(new Date(h.completedAt)) === formatDate(d))) return 0;
+            }
+            while (state.history.some(h => formatDate(new Date(h.completedAt)) === formatDate(d))) {
+                streak++;
+                d.setDate(d.getDate() - 1);
+            }
+            return streak;
+        }
+        
+        function calcGoalProgress(g) {
+            if (g.type === 'frequency') return Math.round((getWeekWorkouts() / g.target) * 100);
+            return Math.round(((g.current || 0) / g.target) * 100);
+        }
+        
+        function calcGoalsProgress() {
+            if (state.goals.length === 0) return 0;
+            return Math.round(state.goals.reduce((a, g) => a + calcGoalProgress(g), 0) / state.goals.length);
+        }
+        
+        function toast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.innerHTML = (type === 'success' ? SVG.checkCircle : type === 'error' ? SVG.x : '') + '<span>' + msg + '</span>';
+            container.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
+        }
+    </script>
+</body>
+</html>
