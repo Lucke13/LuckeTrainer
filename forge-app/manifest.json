@@ -1,6 +1,6 @@
 {
-  "name": "FORGE Träningsdagbok",
-  "short_name": "FORGE",
+  "name": "LuckeTrainer",
+  "short_name": "LT",
   "description": "Din personliga träningsdagbok",
   "start_url": "/LuckeTrainer/forge-app/",
   "display": "standalone",
