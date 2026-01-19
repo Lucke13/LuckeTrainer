@@ -1,4 +1,4 @@
-const CACHE_NAME = 'forge-v1';
+const CACHE_NAME = 'LT-v1';
 const urlsToCache = [
   '/',
   '/index.html',
